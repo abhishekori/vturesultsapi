@@ -12,7 +12,7 @@ var data;
 
 app.get("/", function (req, res) {
 
-    res.send("The app is live");
+    res.send("The app is live and running");
 });
 app.post("/scrape", function (req, res, next) {
     var finalData={};
