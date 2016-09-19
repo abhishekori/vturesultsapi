@@ -6,8 +6,14 @@ var request = require('request');
 var cheerio = require('cheerio');
 var BodyParser = require('body-parser');
 var app = express();
-app.use(BodyParser.urlencoded({ extended: false }))
+app.use(BodyParser.urlencoded({ extended: false }));
+app.set('port',(process.env.PORT || 5000));
 var data;
+
+app.get("/", function (req, res) {
+
+    res.send("The app is live");
+});
 app.post("/scrape", function (req, res, next) {
     var finalData={};
     request({
@@ -79,8 +85,8 @@ app.post("/scrape", function (req, res, next) {
 
 
 
-app.listen('8081', function () {
+app.listen(app.get('port'), function () {
 
-    console.log("running on 8081");
+    console.log("running on "+app.get('port'));
 })
 
