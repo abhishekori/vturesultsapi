@@ -2,20 +2,17 @@
  * Created by abhishek on 18/9/16.
  */
 var express = require('express');
-var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 var app = express();
 
 var data;
-var htmlData={};
 
 app.get("/scrape",function(req,res){
+    var finalData={};
     request({
-        url: 'http://results.vtu.ac.in/vitavi.php', //URL to hit
-        qs: {from: 'blog example', time: +new Date()}, //Query string data
+        url: 'http://results.vtu.ac.in/vitavi.php',
         method: 'POST',
-        //Lets post the following key/values as form
         form: {
             rid: '1ds13cs007',
             submit: 'SUBMIT'
@@ -25,101 +22,61 @@ app.get("/scrape",function(req,res){
             console.log(error);
         } else {
 
-            // res.send(body.table);
-
-            //console.log(html);
-            var finalData={};
-
 
             var $ = cheerio.load(html);
 
             $("TD[width='513'] B").first().filter(function () {
 
                 data =$(this);
-                finalData['name']=data.text();
+                finalData['name']=data.text().replace(/\s+/g,' ').trim();
 
             });
 
             $("TD[width='513'] TABLE TD:nth-child(2)").first().filter(function () {
+
                 data=$(this);
-                //console.log(data.text());
-                finalData['sem']=data.text();
+                finalData['sem']=data.text().replace(/\s+/g,' ').trim();
 
             });
 
             $("TD[width='513'] TABLE TD:nth-child(4)").first().filter(function () {
+
                 data=$(this);
-               // console.log(data.text());
-                finalData['result']=data.text();
+                finalData['result']=data.text().replace(/\s+/g,' ').trim().substring(8,                     19);
 
             });
 
+            var results=[];
 
-            $("TD[width='513'] table tr:nth-child(3) td:nth-child(1)").first().filter(function () {
-                data=$(this);
-                var fdata=data.text();
+            for(var i=0;i<=7;i++)
+            {
+                results[i]=[];
+                for(var j=0;j<=5;j++){
+                    $("TD[width='513'] table tr:nth-child("+(i+3)+") td:nth-child("+(j+1)+")").first().filter(function () {
 
+                        data=$(this);
+                        var fdata=data.text();
+                        fdata =fdata.replace(/\r?\n|\r/g, "");
+                        results[i].push(fdata);
 
-                //console.log(fdata);
-                finalData['sub1']=[]
-                finalData['sub1'][0]=data.text();
-
-            });
-
-            $("TD[width='513'] table tr:nth-child(3) td:nth-child(2)").first().filter(function () {
-                data=$(this);
-                var fdata=data.text();
-
-
-                //console.log(fdata);
-                finalData['sub1'][1]=data.text();
-
-            });
-
-            $("TD[width='513'] table tr:nth-child(3) td:nth-child(3)").first().filter(function () {
-                data=$(this);
-                var fdata=data.text();
+                    });
+                }
+            }
 
 
-                //console.log(fdata);
-                finalData['sub1'][2]=data.text();
-
-            });
-
-            $("TD[width='513'] table tr:nth-child(3) td:nth-child(4)").first().filter(function () {
-                data=$(this);
-                var fdata=data.text();
+            finalData['results']=results;
+            finalData=JSON.stringify(finalData);
 
 
-                //console.log(fdata);
-                finalData['sub1'][3]=data.text();
-
-            });
-
-            $("TD[width='513'] table tr:nth-child(3) td:nth-child(5)").first().filter(function () {
-                data=$(this);
-                var fdata=data.text();
 
 
-                //console.log(fdata);
-                finalData['sub1'][4]=data.text();
-
-            });
-
-            $("TD[width='513'] table tr:nth-child(3) td:nth-child(6)").first().filter(function () {
-                data=$(this);
-                var fdata=data.text();
-
-
-                //console.log(fdata);
-                finalData['sub1'][5]=data.text();
-
-            });
         }
 
         console.log(finalData);
+        //res.json(finalData);
 
     });
+
 
     res.end();
 
