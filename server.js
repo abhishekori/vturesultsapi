@@ -4,17 +4,17 @@
 var express = require('express');
 var request = require('request');
 var cheerio = require('cheerio');
+var BodyParser = require('body-parser');
 var app = express();
-
+app.use(BodyParser.urlencoded({ extended: false }))
 var data;
-
-app.get("/scrape",function(req,res){
+app.post("/scrape", function (req, res, next) {
     var finalData={};
     request({
         url: 'http://results.vtu.ac.in/vitavi.php',
         method: 'POST',
         form: {
-            rid: '1ds13cs007',
+            rid: req.body.usn,
             submit: 'SUBMIT'
         }
     }, function(error, response, html){
@@ -65,24 +65,17 @@ app.get("/scrape",function(req,res){
 
 
             finalData['results']=results;
-            finalData=JSON.stringify(finalData);
-
-
-
-
         }
-
-        console.log(finalData);
-        //res.json(finalData);
+        req.finalData=finalData;
+        next();
 
     });
+},function(req,res,next){
 
-
-    res.end();
+    console.log("atleast "+req.finalData);
+    res.json(req.finalData);
 
 });
-
-
 
 
 
