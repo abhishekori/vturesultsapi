@@ -53,24 +53,31 @@ app.post("/scrape", function (req, res, next) {
             });
 
             var results=[];
+            var TotalMarks=0;
 
             for(var i=0;i<=7;i++)
             {
                 results[i]=[];
-                for(var j=0;j<=5;j++){
+                for(var j=0;j<=6;j++){
                     $("TD[width='513'] table tr:nth-child("+(i+3)+") td:nth-child("+(j+1)+")").first().filter(function () {
 
                         data=$(this);
                         var fdata=data.text();
                         fdata =fdata.replace(/\r?\n|\r/g, "");
+
+                        if(j==3){
+                           TotalMarks+=parseInt(fdata);
+                        }
                         results[i].push(fdata);
 
                     });
                 }
             }
+            //console.log(TotalMarks);
 
 
             finalData['results']=results;
+            finalData['TotalMarks']=TotalMarks;
         }
         req.finalData=finalData;
         next();
@@ -78,8 +85,10 @@ app.post("/scrape", function (req, res, next) {
     });
 },function(req,res,next){
 
-    console.log("atleast "+req.finalData);
-    res.json(req.finalData);
+   // console.log("atleast "+req.finalData);
+
+    res.json(req.finalData)
+    res.end();
 
 });
 
