@@ -57,7 +57,7 @@ app.post("/scrape", function (req, res, next) {
 
             for(var i=0;i<=7;i++)
             {
-                results[i]=[];
+                results[i]={};
                 for(var j=0;j<=6;j++){
                     $("TD[width='513'] table tr:nth-child("+(i+3)+") td:nth-child("+(j+1)+")").first().filter(function () {
 
@@ -68,7 +68,18 @@ app.post("/scrape", function (req, res, next) {
                         if(j==3){
                            TotalMarks+=parseInt(fdata);
                         }
-                        results[i].push(fdata);
+                        switch (j){
+                            case 0:results[i]["subject"]=fdata;
+                                break;
+                            case 1:results[i]["external"]=fdata;
+                                break;
+                            case 2:results[i]["internal"]=fdata;
+                                break;
+                            case 3:results[i]["total"]=fdata;
+                                break;
+                            case 4:results[i]["result"]=fdata;
+                                break;
+                        }
 
                     });
                 }
